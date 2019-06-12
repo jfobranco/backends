@@ -14,8 +14,7 @@ session_schema_list = SessionSchema(many=True)
 class SessionListResource(Resource):
     def get(self):
         ''' Get current user sessions? '''
-        sessions = Session.query.filter(User.id == 1).options(db.joinedload('services')).all()
-        print(sessions[0].services)
+        sessions = Session.query.filter(User.id == 1).all()
         return session_schema_list.jsonify(sessions)
 
     @api.marshal_with(sessionDTO, code=201)

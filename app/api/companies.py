@@ -1,6 +1,6 @@
 from app import db
 from flask_restplus import Namespace, Resource, fields
-from app.models import Company, CompanySchema, User, Post, Service, ServiceSchema
+from app.models import Company, CompanySchema, User, Post, Service, ServiceSchema, PostSchema
 from flask import jsonify, request
 from .dto import companyDTO, postDTO, serviceDTO
 
@@ -17,6 +17,9 @@ company_schema_list = CompanySchema(many=True)
 
 service_schema = ServiceSchema()
 service_schema_list = ServiceSchema(many=True)
+
+post_schema = PostSchema()
+post_schema_list = PostSchema(many=True)
 
 @api.route('/')
 class CompaniesListResource(Resource):
@@ -47,6 +50,10 @@ class CompaniesPostsResource(Resource):
         db.session.add(post)
         db.session.commit()
         return api.payload
+    
+    def get(self, id):
+        posts = Post.query.filter(Post.company_id == id).all()
+        return post_schema_list.jsonify(posts)
 
 @api.route('/<int:id>/users')
 class CompaniesFollowResource(Resource):

@@ -1,6 +1,7 @@
 from datetime import datetime
 from . import db
 from . import ma
+from marshmallow import fields
 
 user_company = db.Table('user_company', db.Model.metadata,
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
@@ -54,6 +55,19 @@ session_service = db.Table('session_service', db.Model.metadata,
     db.Column('service_id', db.Integer, db.ForeignKey('service.id'))
 )
 
+class Service(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    category = db.Column(db.String(64))
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+
+    def __repr__(self):
+        return '<Service {}>'.format(self.name)
+
+class ServiceSchema(ma.TableSchema):
+    class Meta:
+        table = Service.__table__
+
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(140))
@@ -67,18 +81,7 @@ class Session(db.Model):
         return '<Session {}>'.format(self.status)
 
 class SessionSchema(ma.TableSchema):
+    services = fields.Nested(ServiceSchema, many=True)
+    
     class Meta:
         table = Session.__table__
-
-class Service(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
-    category = db.Column(db.String(64))
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
-
-    def __repr__(self):
-        return '<Service {}>'.format(self.name)
-
-class ServiceSchema(ma.TableSchema):
-    class Meta:
-        table = Service.__table__
